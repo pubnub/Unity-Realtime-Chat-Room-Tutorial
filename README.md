@@ -19,7 +19,7 @@ Once imported, you may notice you have some errors in your console window. If yo
 
 The GitHub repo should include four folders. Assets, PubNub, Scenes and Scripts. In the Assets folder, there is a background image, submit button, font files and a loading circle. In the Scripts folder, there are the two scripts called SendMessage and LoadingCircle. The SendMessage script is where we will be writing the code to send and receive messages from clients in realtime.
 
-## Finish the Tutorial by going to https://unity.chat
+## Finish the Tutorial by going to https://www.pubnub.com/docs/chat/tutorials/unity
 
 Try the demo here. Open up two browser windows and zoom out in your browser window
-https://jordanschuetz.github.io/Unity-Realtime-Chat-Room-Tutorial/
+https://pubnub.github.io/Unity-Realtime-Chat-Room-Tutorial/
