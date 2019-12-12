@@ -1,0 +1,66 @@
+# =============== #
+# Unity generated #
+# =============== #
+*/Assets/AssetStoreTools*
+*/[Tt]emp/
+*/[Oo]bj/
+*/UnityGenerated/
+*/[Bb]uild/
+*/[Bb]uilds/
+*/UWP/
+
+# ===================================== #
+# Visual Studio / MonoDevelop generated #
+# ===================================== #
+ExportedObj/
+.consulo/
+*.svd
+*.userprefs
+*.csproj
+*.pidb
+*.suo
+*.sln
+*.svd
+*.user
+*.unityproj
+*.tmp
+*.booproj
+*/.vs/
+*.pdb
+/PubNubUnity/Library/metadata/*
+/PubNubUnity/Library/PackageCache/*.meta
+/PubNubUnity/Library/ShaderCache/*
+/PubNubUnity/Library/*.log
+/PubNubUnity/Library/ScriptAssemblies/*.meta
+/PubNubUnity/Logs/*
+/PubNubUnity/Library/*.asset
+/PubNubUnity/Library/*.txt
+/PubNubUnity/Library/*.prefs
+/PubNubUnity/Library/*.dwlt
+/PubNubUnity/Library/*.db
+/PubNubUnity/Assets/*.meta
+/PubNubUnity/Library/*.meta
+/PubNubUnity/Packages/*.meta
+
+# Unity3D generated meta files
+*.pidb.meta
+
+# Unity3D Generated File On Crash Reports
+sysinfo.txt
+
+# Builds
+*.apk
+*.unitypackage
+
+ 
+# ============ #
+# OS generated #
+# ============ #
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+Thumbs.db

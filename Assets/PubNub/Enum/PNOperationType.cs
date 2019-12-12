@@ -1,0 +1,56 @@
+﻿using System;
+
+namespace PubNubAPI
+{
+    public enum PNOperationType 
+    {
+        PNSubscribeOperation,
+        PNPresenceOperation,
+        PNUnsubscribeOperation,
+        PNPresenceUnsubscribeOperation,
+        PNPublishOperation,
+        PNFireOperation,
+        PNLeaveOperation,
+        PNHistoryOperation,
+        PNDeleteMessagesOperation,
+        PNFetchMessagesOperation,
+        PNMessageCountsOperation,
+        PNWhereNowOperation,
+        PNHeartbeatOperation,
+        PNPresenceHeartbeatOperation,
+        PNSetStateOperation,
+        PNGetStateOperation,
+        PNAddChannelsToGroupOperation,
+        PNRemoveChannelsFromGroupOperation,
+        PNChannelGroupsOperation,
+        PNRemoveGroupOperation,
+        PNChannelsForGroupOperation,
+        PNPushNotificationEnabledChannelsOperation,
+        PNAddPushNotificationsOnChannelsOperation,
+        PNRemovePushNotificationsFromChannelsOperation,
+        PNRemoveAllPushNotificationsOperation,
+        PNTimeOperation,
+        PNHereNowOperation,
+        PNSignalOperation,
+        PNGetMessageActionsOperation,
+        PNAddMessageActionsOperation,
+        PNRemoveMessageActionsOperation,
+    	PNHistoryWithActionsOperation,		
+	    PNCreateUserOperation,		
+	    PNGetUsersOperation,		
+	    PNGetUserOperation,		
+        PNUpdateUserOperation,		
+	    PNDeleteUserOperation,
+	    PNGetSpaceOperation,
+        PNGetSpacesOperation,		
+	    PNCreateSpaceOperation,		
+	    PNDeleteSpaceOperation,		
+	    PNUpdateSpaceOperation,		
+	    PNGetMembershipsOperation,		
+	    PNGetMembersOperation,		
+	    PNManageMembershipsOperation,		
+	    PNManageMembersOperation
+    }
+
+}
+
