@@ -22,11 +22,11 @@ public class SendMessage : MonoBehaviour {
     public Text moveTextUpwards;
     private Text text;
 
-    float paddingX = 0F;
+    float paddingX = -10F;
     float paddingY = 300F;
-    float padding = 600F;
+    float padding = 550F;
     float height = 30;
-    ushort maxMessagesToDisplay = 15;
+    ushort maxMessagesToDisplay = 12;
 
     string channel = "chatchannel3";
 
