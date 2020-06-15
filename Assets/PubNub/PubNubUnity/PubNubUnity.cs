@@ -40,8 +40,9 @@ namespace PubNubAPI
             base.PNLog.WriteToLog (string.Format("Init with UUID {0}", base.PNConfig.UUID), PNLoggingMethod.LevelInfo);
             #endif
             SubscriptionInstance = new Subscription (this);
-            SubWorker = new SubscriptionWorker<SubscribeEnvelope>(this); 
+            SubWorker = new SubscriptionWorker<SubscribeEnvelope>(this);             
             base.QManager.PubNubInstance = this;
+            base.tokenManager = new TokenManager(this);
 
             //TODO test
             PNConfig.UUIDChanged += (sender, e) =>{
@@ -69,28 +70,28 @@ namespace PubNubAPI
                 #endif
                 
                 if(mea!=null){
-                    if(mea.Status != null){
+                    if(mea.Status != null && statusCallback != null){
                         statusCallback(mea.Status);
                     }
-                    if(mea.MessageResult != null){
+                    if(mea.MessageResult != null && messageCallback != null){
                         messageCallback(mea.MessageResult);
                     }
-                    if(mea.PresenceEventResult != null){
+                    if(mea.PresenceEventResult != null && presenceCallback != null){
                         presenceCallback(mea.PresenceEventResult);
                     }
-                    if(mea.MessageResult != null){
+                    if(mea.SignalEventResult != null && signalCallback != null){
                         signalCallback(mea.SignalEventResult);
                     }
-                    if(mea.UserEventResult != null){
+                    if(mea.UserEventResult != null && userCallback != null){
                         userCallback(mea.UserEventResult);
                     }
-                    if(mea.SpaceEventResult != null){
+                    if(mea.SpaceEventResult != null && spaceCallback != null){
                         spaceCallback(mea.SpaceEventResult);
                     }
-                    if(mea.MembershipEventResult != null){
+                    if(mea.MembershipEventResult != null && membershipCallback != null){
                         membershipCallback(mea.MembershipEventResult);
                     }
-                    if(mea.MessageActionsEventResult != null){
+                    if(mea.MessageActionsEventResult != null && messageActionsCallback != null){
                         messageActionsCallback(mea.MessageActionsEventResult);
                     }
 
@@ -369,6 +370,15 @@ namespace PubNubAPI
             #endif
 
             return new GetMembersBuilder(this);
+        }
+
+        public GrantTokenBuilder GrantToken()
+        {
+            #if (ENABLE_PUBNUB_LOGGING)
+            this.PNLog.WriteToLog("GrantToken", PNLoggingMethod.LevelInfo);
+            #endif
+
+            return new GrantTokenBuilder(this);
         }
 
         public GetMembershipsBuilder GetMemberships()

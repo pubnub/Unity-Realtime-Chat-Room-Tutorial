@@ -12,8 +12,10 @@ namespace PubNubAPI
         private string GetMembershipsEnd { get; set;}
         private string GetMembershipsStart { get; set;}
         private bool GetMembershipsCount { get; set;}
+        private string GetMembershipsFilter { get; set;}
         private PNMembershipsInclude[] GetMembershipsInclude { get; set;}
-        
+        private List<string> SortBy { get; set; }
+
         public GetMembershipsRequestBuilder(PubNubUnity pn): base(pn, PNOperationType.PNGetMembershipsOperation){
         }
 
@@ -47,15 +49,24 @@ namespace PubNubAPI
             GetMembershipsEnd = end;
             return this;
         }
+        public GetMembershipsRequestBuilder Filter(string filter){
+            GetMembershipsFilter = filter;
+            return this;
+        }
         public GetMembershipsRequestBuilder Count(bool count){
             GetMembershipsCount = count;
+            return this;
+        }
+        public GetMembershipsRequestBuilder Sort(List<string> sortBy){
+            SortBy = sortBy;
             return this;
         }
         protected override void RunWebRequest(QueueManager qm){
             RequestState requestState = new RequestState ();
             requestState.OperationType = OperationType;
 
-            string[] includeString = (GetMembershipsInclude==null) ? new string[]{} : GetMembershipsInclude.Select(a=>a.GetDescription().ToString()).ToArray(); 
+            string[] includeString = (GetMembershipsInclude==null) ? new string[]{} : GetMembershipsInclude.Select(a=>a.GetDescription().ToString()).ToArray();
+            List<string> sortFields = SortBy ?? new List<string>();
 
             Uri request = BuildRequests.BuildObjectsGetMembershipsRequest(
                     GetMembershipsUserID,
@@ -65,8 +76,11 @@ namespace PubNubAPI
                     GetMembershipsCount,
                     string.Join(",", includeString),
                     this.PubNubInstance,
-                    this.QueryParams
+                    this.QueryParams,
+                    GetMembershipsFilter,
+                   string.Join(",", sortFields)
                 );
+            request = this.PubNubInstance.TokenMgr.AppendTokenToURL( request.OriginalString, GetMembershipsUserID, PNResourceType.PNUsers, OperationType);    
             base.RunWebRequest(qm, request, requestState, this.PubNubInstance.PNConfig.NonSubscribeTimeout, 0, this); 
         }
 
