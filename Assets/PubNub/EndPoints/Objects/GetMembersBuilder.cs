@@ -34,6 +34,15 @@ namespace PubNubAPI
             getMembersBuilder.End(end);
             return this;
         }
+        public GetMembersBuilder Filter(string filter)
+        {
+            getMembersBuilder.Filter(filter);
+            return this;
+        }
+        public GetMembersBuilder Sort(List<string> sortBy){
+            getMembersBuilder.Sort(sortBy);
+            return this;
+        }
         public GetMembersBuilder Count(bool count){
             getMembersBuilder.Count(count);
             return this;

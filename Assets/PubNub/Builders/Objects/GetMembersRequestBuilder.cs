@@ -11,8 +11,10 @@ namespace PubNubAPI
         private int GetMembersLimit { get; set;}
         private string GetMembersEnd { get; set;}
         private string GetMembersStart { get; set;}
+        private string GetMembersFilter { get; set;}
         private bool GetMembersCount { get; set;}
         private PNMembersInclude[] GetMembersInclude { get; set;}
+        private List<string> SortBy { get; set; }
         
         public GetMembersRequestBuilder(PubNubUnity pn): base(pn, PNOperationType.PNGetMembersOperation){
         }
@@ -47,6 +49,14 @@ namespace PubNubAPI
             GetMembersEnd = end;
             return this;
         }
+        public GetMembersRequestBuilder Filter(string filter){
+            GetMembersFilter = filter;
+            return this;
+        }
+        public GetMembersRequestBuilder Sort(List<string> sortBy){
+            SortBy = sortBy;
+            return this;
+        }
         public GetMembersRequestBuilder Count(bool count){
             GetMembersCount = count;
             return this;
@@ -55,7 +65,8 @@ namespace PubNubAPI
             RequestState requestState = new RequestState ();
             requestState.OperationType = OperationType;
 
-            string[] includeString = (GetMembersInclude==null) ? new string[]{} : GetMembersInclude.Select(a=>a.GetDescription().ToString()).ToArray(); 
+            string[] includeString = (GetMembersInclude==null) ? new string[]{} : GetMembersInclude.Select(a=>a.GetDescription().ToString()).ToArray();
+            List<string> sortFields = SortBy ?? new List<string>();
 
             Uri request = BuildRequests.BuildObjectsGetMembersRequest(
                     GetMembersSpaceID,
@@ -65,8 +76,11 @@ namespace PubNubAPI
                     GetMembersCount,
                     string.Join(",", includeString),
                     this.PubNubInstance,
-                    this.QueryParams
+                    this.QueryParams,
+                    GetMembersFilter,
+                    string.Join(",", sortFields)
                 );
+            request = this.PubNubInstance.TokenMgr.AppendTokenToURL( request.OriginalString, GetMembersSpaceID, PNResourceType.PNSpaces, OperationType);    
             base.RunWebRequest(qm, request, requestState, this.PubNubInstance.PNConfig.NonSubscribeTimeout, 0, this); 
         }
 

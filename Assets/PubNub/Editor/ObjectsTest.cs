@@ -1013,14 +1013,29 @@ namespace PubNubAPI.Tests
             TestObjectsGetUsersCommon (true, false, false, 0, "", "", false);
         }
 
-        [Test]
+         [Test]
         public void TestObjectsGetUsersRequestQueryParam64 ()
         {
             TestObjectsGetUsersCommon (true, true, true, 0, "", "", false);
         }
         
-
         public void TestObjectsGetUsersCommon(bool ssl, bool sendQueryParams, bool withIncl,  int limit, string start, string end, bool count){
+            TestObjectsGetUsersCommon(ssl, sendQueryParams, withIncl, limit, start, end, count, false, false);
+        }
+        
+        [Test]
+        public void TestObjectsGetUsersRequestWithFilterQueryParam64 ()
+        {
+            TestObjectsGetUsersCommon (true, true, true, 0, "", "", false, true, false);
+        }
+
+        [Test]
+        public void TestObjectsGetUsersRequestWithSortQueryParam65()
+        {
+            TestObjectsGetUsersCommon(true, true, true, 0, "", "", false, false, true);
+        }
+
+        public void TestObjectsGetUsersCommon(bool ssl, bool sendQueryParams, bool withIncl,  int limit, string start, string end, bool count, bool withFilter, bool withSort){
             string uuid = "customuuid";
 
             Dictionary<string,string> queryParams = new Dictionary<string, string>();
@@ -1030,6 +1045,16 @@ namespace PubNubAPI.Tests
                 queryParamString="&d=f";
             } else {
                 queryParams = null;
+            }
+
+            string filter = "";
+            if(withFilter){
+                filter = "name like 'abc - / s*'";
+            }
+
+            string sortBy = "";
+            if (withSort){
+                sortBy = "name:desc";
             }
 
             PNConfiguration pnConfiguration = new PNConfiguration ();
@@ -1052,10 +1077,10 @@ namespace PubNubAPI.Tests
                 incl = "";
             }
 
-            Uri uri = BuildRequests.BuildObjectsGetUsersRequest (limit, start, end, count, incl, pnUnity, queryParams);
+            Uri uri = BuildRequests.BuildObjectsGetUsersRequest (limit, start, end, count, incl, pnUnity, queryParams, filter, sortBy);
 
             //https://ps.pndsn.com/v1/objects/demo/spaces/UnityUnitTests_86?uuid=customuuid&pnsdk=PubNub-CSharp-UnityOSX%2F4.3.0 
-            string expected = string.Format ("http{0}://{1}/v1/objects/{2}/users?uuid={3}{7}{10}{4}{8}{9}&pnsdk={5}{6}",
+            string expected = string.Format ("http{0}://{1}/v1/objects/{2}/users?uuid={3}{7}{10}{11}{4}{8}{9}{12}&pnsdk={5}{6}",
                 ssl?"s":"", 
                 pnConfiguration.Origin, 
                 EditorCommon.SubscribeKey, 
@@ -1066,7 +1091,9 @@ namespace PubNubAPI.Tests
                 (string.IsNullOrEmpty(incl))?"":string.Format("&include={0}",incl),
                 (string.IsNullOrEmpty(start))?"":string.Format("&start={0}",start),
                 (string.IsNullOrEmpty(end))?"":string.Format("&end={0}",end),
-                (count) ? "&count=1" : "&count=0"
+                (count) ? "&count=1" : "&count=0",
+                (withFilter)?"&filter=name%20like%20%27abc%20-%20%2F%20s%2A%27":"",
+                (withSort)?"&sort=name%3Adesc":""
             );
 
             string received = uri.OriginalString;
@@ -1457,8 +1484,24 @@ namespace PubNubAPI.Tests
             TestObjectsGetSpacesCommon (true, true, true, 0, "", "", false);
         }
         
+        [Test]
+        public void TestObjectsGetSpacesRequestWithFilterQueryParam64 ()
+        {
+            TestObjectsGetSpacesCommon (true, true, true, 0, "", "", false, true, false);
+        }
+        
+        [Test]
+        public void TestObjectsGetSpacesRequestWithSortQueryParam65()
+        {
+            TestObjectsGetSpacesCommon(true, true, true, 0, "", "", false, false, true);
+        }
 
         public void TestObjectsGetSpacesCommon(bool ssl, bool sendQueryParams, bool withIncl,  int limit, string start, string end, bool count){
+            TestObjectsGetSpacesCommon(ssl, sendQueryParams, withIncl, limit, start, end, count, false, false);
+        }
+
+        public void TestObjectsGetSpacesCommon(bool ssl, bool sendQueryParams, bool withIncl, int limit, string start, string end, bool count, bool withFilter, bool withSort)
+        {            
             string uuid = "customuuid";
 
             Dictionary<string,string> queryParams = new Dictionary<string, string>();
@@ -1490,10 +1533,19 @@ namespace PubNubAPI.Tests
                 incl = "";
             }
 
-            Uri uri = BuildRequests.BuildObjectsGetSpacesRequest (limit, start, end, count, incl, pnUnity, queryParams);
+            string filter = "";
+            if(withFilter){
+                filter = "name == 'abc - / s*'";
+            }
+            string sortBy = "";
+            if (withSort){
+                sortBy = "name:desc";
+            }
+
+            Uri uri = BuildRequests.BuildObjectsGetSpacesRequest (limit, start, end, count, incl, pnUnity, queryParams, filter, sortBy);
 
             //https://ps.pndsn.com/v1/objects/demo/spaces/UnityUnitTests_86?uuid=customuuid&pnsdk=PubNub-CSharp-UnityOSX%2F4.3.0 
-            string expected = string.Format ("http{0}://{1}/v1/objects/{2}/spaces?uuid={3}{7}{10}{4}{8}{9}&pnsdk={5}{6}",
+            string expected = string.Format ("http{0}://{1}/v1/objects/{2}/spaces?uuid={3}{7}{10}{11}{4}{8}{9}{12}&pnsdk={5}{6}",
                 ssl?"s":"", 
                 pnConfiguration.Origin, 
                 EditorCommon.SubscribeKey, 
@@ -1504,14 +1556,16 @@ namespace PubNubAPI.Tests
                 (string.IsNullOrEmpty(incl))?"":string.Format("&include={0}",incl),
                 (string.IsNullOrEmpty(start))?"":string.Format("&start={0}",start),
                 (string.IsNullOrEmpty(end))?"":string.Format("&end={0}",end),
-                (count) ? "&count=1" : "&count=0"
+                (count) ? "&count=1" : "&count=0",
+                (withFilter)?"&filter=name%20%3D%3D%20%27abc%20-%20%2F%20s%2A%27":"",
+                (withSort) ? "&sort=name%3Adesc" : ""
             );
 
             string received = uri.OriginalString;
             EditorCommon.LogAndCompare (expected, received);
         }
 
-        [Test]
+       [Test]
         public void TestObjectsGetMembersRequest1 ()
         {
             TestObjectsGetMembersCommon (true, false, true, 100, "s", "e", true);
@@ -1897,6 +1951,23 @@ namespace PubNubAPI.Tests
         
 
         public void TestObjectsGetMembersCommon(bool ssl, bool sendQueryParams, bool withIncl,  int limit, string start, string end, bool count){
+            TestObjectsGetMembersCommon(ssl, sendQueryParams, withIncl, limit, start, end, count, false,false);
+        }         
+
+        [Test]
+        public void TestObjectsGetMembersRequestWithFilterQueryParam64 ()
+        {
+            TestObjectsGetMembersCommon (true, true, true, 0, "", "", false, true,false);
+        }
+
+        [Test]
+        public void TestObjectsGetMembersRequestWithSortQueryParam65()
+        {
+            TestObjectsGetMembersCommon(true, true, true, 0, "", "", false, true, true);
+        }
+
+
+        public void TestObjectsGetMembersCommon(bool ssl, bool sendQueryParams, bool withIncl, int limit, string start, string end, bool count, bool withFilter, bool withSort){            
             string uuid = "customuuid";
 
             Dictionary<string,string> queryParams = new Dictionary<string, string>();
@@ -1929,10 +2000,20 @@ namespace PubNubAPI.Tests
             }
             string ch = "ch";
 
-            Uri uri = BuildRequests.BuildObjectsGetMembersRequest (ch, limit, start, end, count, incl, pnUnity, queryParams);
+            string filter = "";
+            if(withFilter){
+                filter = "name == 'abc - / s'*";
+            }
+
+            string sortBy = "";
+            if (withSort){
+                sortBy = "name:desc";
+            }
+
+            Uri uri = BuildRequests.BuildObjectsGetMembersRequest (ch, limit, start, end, count, incl, pnUnity, queryParams, filter, sortBy);
 
             //https://ps.pndsn.com/v1/objects/demo/spaces/UnityUnitTests_86?uuid=customuuid&pnsdk=PubNub-CSharp-UnityOSX%2F4.3.0 
-            string expected = string.Format ("http{0}://{1}/v1/objects/{2}/spaces/{11}/users?uuid={3}{7}{10}{4}{8}{9}&pnsdk={5}{6}",
+            string expected = string.Format ("http{0}://{1}/v1/objects/{2}/spaces/{11}/users?uuid={3}{7}{10}{12}{4}{8}{9}{13}&pnsdk={5}{6}",
                 ssl?"s":"", 
                 pnConfiguration.Origin, 
                 EditorCommon.SubscribeKey, 
@@ -1944,7 +2025,9 @@ namespace PubNubAPI.Tests
                 (string.IsNullOrEmpty(start))?"":string.Format("&start={0}",start),
                 (string.IsNullOrEmpty(end))?"":string.Format("&end={0}",end),
                 (count) ? "&count=1" : "&count=0",
-                ch
+                ch,
+                (withFilter)?"&filter=name%20%3D%3D%20%27abc%20-%20%2F%20s%27%2A":"",
+                (withSort) ? "&sort=name%3Adesc" : ""
             );
 
             string received = uri.OriginalString;
@@ -2334,9 +2417,27 @@ namespace PubNubAPI.Tests
         {
             TestObjectsGetMembershipsCommon (true, true, true, 0, "", "", false);
         }
-        
 
-        public void TestObjectsGetMembershipsCommon(bool ssl, bool sendQueryParams, bool withIncl,  int limit, string start, string end, bool count){
+        public void TestObjectsGetMembershipsCommon(bool ssl, bool sendQueryParams, bool withIncl, int limit, string start, string end, bool count){
+            TestObjectsGetMembershipsCommon(ssl, sendQueryParams, withIncl, limit, start, end, count, false);
+        }
+
+        [Test]
+        public void TestObjectsGetMembershipsRequestWithFilterQueryParam64 ()
+        {
+            TestObjectsGetMembershipsCommon (true, true, true, 0, "", "", false, true);
+        }
+
+        [Test]
+        public void TestObjectsGetMembershipsRequestWithSortQueryParam65()
+        {
+            TestObjectsGetMembershipsCommon(true, true, true, 0, "", "", false, true,true);
+        }
+
+        public void TestObjectsGetMembershipsCommon(bool ssl, bool sendQueryParams, bool withIncl, int limit, string start, string end, bool count, bool withFilter){
+            TestObjectsGetMembershipsCommon(ssl,sendQueryParams,withIncl,limit,start,end,count,withFilter,false);
+        }
+        public void TestObjectsGetMembershipsCommon(bool ssl, bool sendQueryParams, bool withIncl, int limit, string start, string end, bool count, bool withFilter, bool withSort){            
             string uuid = "customuuid";
 
             Dictionary<string,string> queryParams = new Dictionary<string, string>();
@@ -2368,14 +2469,23 @@ namespace PubNubAPI.Tests
                 incl = "";
             }
             string ch = "ch";
+            
+            string filter = "name == 's1236 9'";
+            if(!withFilter){
+                filter = "";
+            }
+            string sortBy = "";
+            if (withSort){
+                sortBy = "name:desc";
+            }
 
-            Uri uri = BuildRequests.BuildObjectsGetMembershipsRequest (ch, limit, start, end, count, incl, pnUnity, queryParams);
+            Uri uri = BuildRequests.BuildObjectsGetMembershipsRequest (ch, limit, start, end, count, incl, pnUnity, queryParams, filter, sortBy);
 
             //https://ps.pndsn.com/v1/objects/demo/spaces/UnityUnitTests_86?uuid=customuuid&pnsdk=PubNub-CSharp-UnityOSX%2F4.3.0 
-            string expected = string.Format ("http{0}://{1}/v1/objects/{2}/users/{11}/spaces?uuid={3}{7}{10}{4}{8}{9}&pnsdk={5}{6}",
-                ssl?"s":"", 
-                pnConfiguration.Origin, 
-                EditorCommon.SubscribeKey, 
+            string expected = string.Format ("http{0}://{1}/v1/objects/{2}/users/{11}/spaces?uuid={3}{7}{10}{12}{4}{8}{9}{13}&pnsdk={5}{6}",
+                ssl?"s":"",
+                pnConfiguration.Origin,
+                EditorCommon.SubscribeKey,
                 uuid, 
                 (limit>0)?string.Format("&limit={0}", limit.ToString()):"",
                 Utility.EncodeUricomponent(pnUnity.Version, PNOperationType.PNPublishOperation, false, false),
@@ -2384,7 +2494,9 @@ namespace PubNubAPI.Tests
                 (string.IsNullOrEmpty(start))?"":string.Format("&start={0}",start),
                 (string.IsNullOrEmpty(end))?"":string.Format("&end={0}",end),
                 (count) ? "&count=1" : "&count=0",
-                ch
+                ch,
+                (withFilter)?"&filter=name%20%3D%3D%20%27s1236%209%27":"",
+                (withSort) ? "&sort=name%3Adesc" : ""
             );
 
             string received = uri.OriginalString;
@@ -2774,9 +2886,18 @@ namespace PubNubAPI.Tests
         {
             TestObjectsManageMembershipsCommon (true, true, true, 0, "", "", false);
         }
-        
 
-        public void TestObjectsManageMembershipsCommon(bool ssl, bool sendQueryParams, bool withIncl,  int limit, string start, string end, bool count){
+        [Test]
+        public void TestObjectsManageMembershipsRequestSortQueryParam65()
+        {
+            TestObjectsManageMembershipsCommon(true, true, true, 0, "", "", false, true);
+        }
+
+        public void TestObjectsManageMembershipsCommon(bool ssl, bool sendQueryParams, bool withIncl, int limit, string start, string end, bool count){
+            TestObjectsManageMembershipsCommon(ssl,sendQueryParams,withIncl,limit,start,end,count,false);
+        }
+
+        public void TestObjectsManageMembershipsCommon(bool ssl, bool sendQueryParams, bool withIncl,  int limit, string start, string end, bool count, bool withSort){
             string uuid = "customuuid";
 
             Dictionary<string,string> queryParams = new Dictionary<string, string>();
@@ -2807,12 +2928,17 @@ namespace PubNubAPI.Tests
             if(!withIncl){
                 incl = "";
             }
+            string sortBy = "";
+            if (withSort){
+                sortBy = "name:desc";
+            }
+
             string ch = "ch";
 
-            Uri uri = BuildRequests.BuildObjectsManageMembershipsRequest (ch, limit, start, end, count, incl, pnUnity, queryParams);
+            Uri uri = BuildRequests.BuildObjectsManageMembershipsRequest (ch, limit, start, end, count, incl, pnUnity, queryParams,sortBy);
 
             //https://ps.pndsn.com/v1/objects/demo/spaces/UnityUnitTests_86?uuid=customuuid&pnsdk=PubNub-CSharp-UnityOSX%2F4.3.0 
-            string expected = string.Format ("http{0}://{1}/v1/objects/{2}/users/{11}/spaces?uuid={3}{7}{10}{4}{8}{9}&pnsdk={5}{6}",
+            string expected = string.Format ("http{0}://{1}/v1/objects/{2}/users/{11}/spaces?uuid={3}{7}{10}{4}{8}{9}{12}&pnsdk={5}{6}",
                 ssl?"s":"", 
                 pnConfiguration.Origin, 
                 EditorCommon.SubscribeKey, 
@@ -2824,7 +2950,8 @@ namespace PubNubAPI.Tests
                 (string.IsNullOrEmpty(start))?"":string.Format("&start={0}",start),
                 (string.IsNullOrEmpty(end))?"":string.Format("&end={0}",end),
                 (count) ? "&count=1" : "&count=0",
-                ch
+                ch,
+                (withSort) ? "&sort=name%3Adesc" : ""
             );
 
             string received = uri.OriginalString;
@@ -3214,9 +3341,16 @@ namespace PubNubAPI.Tests
         {
             TestObjectsManageMembersCommon (true, true, true, 0, "", "", false);
         }
-        
+        [Test]
+        public void TestObjectsManageMembersRequestwithSortQueryParam65(){
+            TestObjectsManageMembersCommon(true, true, true, 0, "", "", false,true);
+        }
 
-        public void TestObjectsManageMembersCommon(bool ssl, bool sendQueryParams, bool withIncl,  int limit, string start, string end, bool count){
+        public void TestObjectsManageMembersCommon(bool ssl, bool sendQueryParams, bool withIncl, int limit, string start, string end, bool count){
+            TestObjectsManageMembersCommon(ssl, sendQueryParams, withIncl, limit, start, end, count, false);
+        }
+
+        public void TestObjectsManageMembersCommon(bool ssl, bool sendQueryParams, bool withIncl,  int limit, string start, string end, bool count, bool withSort){
             string uuid = "customuuid";
 
             Dictionary<string,string> queryParams = new Dictionary<string, string>();
@@ -3249,10 +3383,15 @@ namespace PubNubAPI.Tests
             }
             string ch = "ch";
 
-            Uri uri = BuildRequests.BuildObjectsManageMembersRequest (ch, limit, start, end, count, incl, pnUnity, queryParams);
+            string sortBy = "";
+            if (withSort){
+                sortBy = "name:desc";
+            }
+
+            Uri uri = BuildRequests.BuildObjectsManageMembersRequest (ch, limit, start, end, count, incl, pnUnity, queryParams, sortBy);
 
             //https://ps.pndsn.com/v1/objects/demo/spaces/UnityUnitTests_86?uuid=customuuid&pnsdk=PubNub-CSharp-UnityOSX%2F4.3.0 
-            string expected = string.Format ("http{0}://{1}/v1/objects/{2}/spaces/{11}/users?uuid={3}{7}{10}{4}{8}{9}&pnsdk={5}{6}",
+            string expected = string.Format ("http{0}://{1}/v1/objects/{2}/spaces/{11}/users?uuid={3}{7}{10}{4}{8}{9}{12}&pnsdk={5}{6}",
                 ssl?"s":"", 
                 pnConfiguration.Origin, 
                 EditorCommon.SubscribeKey, 
@@ -3264,7 +3403,8 @@ namespace PubNubAPI.Tests
                 (string.IsNullOrEmpty(start))?"":string.Format("&start={0}",start),
                 (string.IsNullOrEmpty(end))?"":string.Format("&end={0}",end),
                 (count) ? "&count=1" : "&count=0",
-                ch
+                ch,
+                (withSort) ? "&sort=name%3Adesc" : ""
             );
 
             string received = uri.OriginalString;

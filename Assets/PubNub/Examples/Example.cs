@@ -3,6 +3,7 @@ using System.Collections;
 using PubNubAPI;
 using System.Collections.Generic;
 using System;
+using System.Text;
 
 namespace PubNubExample
 {
@@ -46,7 +47,7 @@ namespace PubNubExample
 
         UnityEngine.UI.Button ButtonSignal;
 
-        string deviceId = "aaa";
+        string deviceId = "ababababababababababababababababababababababababababababababababababababababababababababab";
         PNPushType pnPushType = PNPushType.GCM;
 
         void Awake(){
@@ -87,7 +88,6 @@ namespace PubNubExample
         }
         void ButtonDeleteHistoryHandler(){
             pubnub.DeleteMessages().Channel("channel1").Start(15078932998876451).End(15078933628583256).Async((result, status) => {
-            //pubnub.DeleteMessages().Channel("channel1").Async((result, status) => {                
                 Debug.Log ("in DeleteMessages");
                 if(!status.Error){
                     Debug.Log (string.Format("DateTime {0}, In DeleteMessages Example, Timetoken: {1}", DateTime.UtcNow , result.Message));
@@ -127,7 +127,7 @@ namespace PubNubExample
         void ButtonSetPresenceStateHandler(){
             Dictionary<string, object> state = new Dictionary<string, object>();
             state.Add  ("k1", "v1");
-            pubnub.SetPresenceState().Channels(listChannels).ChannelGroups(listChannelGroups).State(state).Async ((result, status) => {
+            pubnub.SetPresenceState().Channels(new List<string> (){ch1}).State(state).Async ((result, status) => {
                 if(status.Error){
                     Debug.Log (string.Format("In Example, SetPresenceState Error: {0} {1} {2}", status.StatusCode, status.ErrorData, status.Category));
                 } else {
@@ -192,7 +192,7 @@ namespace PubNubExample
         void ButtonHereNowHandler(){
             Dictionary<string,string> dict = new Dictionary<string, string>();
             dict.Add("d","f");
-            pubnub.HereNow().Channels(listChannels).ChannelGroups(listChannelGroups).IncludeState(true).IncludeUUIDs(true).QueryParam(dict).Async((result, status) => {
+            pubnub.HereNow().IncludeState(true).IncludeUUIDs(true).QueryParam(dict).Async((result, status) => {
                     Debug.Log ("in HereNow1");
                     if(status.Error){
                         PrintStatus(status);
@@ -306,6 +306,15 @@ namespace PubNubExample
                         Display(string.Format("AddPushNotificationsOnChannels: {0}", result.Message));
                     }
                 });
+            pubnub.AddPushNotificationsOnChannels().Channels(listChannels).DeviceID(deviceId).PushType(PNPushType.APNS2).Topic("a").Async((result, status) => {
+                    Debug.Log ("in AddPushNotificationsOnChannels");
+                    if(status.Error){
+                        Debug.Log (string.Format("In Example, AddPushNotificationsOnChannels Error: {0} {1} {2}", status.StatusCode, status.ErrorData, status.Category));
+                    } else {
+                        Debug.Log (string.Format("DateTime {0}, In AddPushNotificationsOnChannels, result: {1}", DateTime.UtcNow, result.Message));
+                        Display(string.Format("AddPushNotificationsOnChannels: {0}", result.Message));
+                    }
+                });    
         }
         void ButtonAuditPushChannelProvisionsHandler(){
             AuditPushChannelProvisions(pubnub, deviceId, pnPushType);
@@ -339,7 +348,7 @@ namespace PubNubExample
             dict.Add  ("k1", "v1");
             pubnub.SubscribeCallback += SubscribeCallbackHandler;
 
-            pubnub.Subscribe ().Channels(new List<string> (){ch1}).WithPresence().QueryParam(dict).Execute();
+            pubnub.Subscribe().Channels(new List<string> (){ch1}).QueryParam(dict).Execute();
         }
 
         void AddComponents(){
@@ -416,10 +425,13 @@ namespace PubNubExample
             pnConfiguration.SubscribeKey = "demo";
             pnConfiguration.PublishKey = "demo";
             pnConfiguration.SecretKey = "demo";
+        pnConfiguration.PublishKey = "pub-c-3ed95c83-12e6-4cda-9d69-c47ba2abb57e"; 
+        pnConfiguration.SubscribeKey = "sub-c-26a73b0a-c3f2-11e9-8b24-569e8a5c3af3"; 
+
             pnConfiguration.CipherKey = "enigma";
             pnConfiguration.LogVerbosity = PNLogVerbosity.BODY; 
-            pnConfiguration.PresenceTimeout = 19;    
-            pnConfiguration.PresenceInterval= 12;
+            pnConfiguration.PresenceTimeout = 120;    
+            pnConfiguration.PresenceInterval= 60;
             pnConfiguration.AuthKey = "authKey";
             pnConfiguration.HeartbeatNotificationOption = PNHeartbeatNotificationOption.All;
 
@@ -434,7 +446,6 @@ namespace PubNubExample
         }
 
         void MessageCounts(List<string> listChannels, PubNub pubnub){
-            //pubnub.MessageCounts().ChannelTimetokens(new List<string>{"15499825804610610","15499925804610615"}).Channels(listChannels).Timetoken("1549982652").Async((result, status) =>{
             pubnub.MessageCounts().Channels(listChannels).ChannelsTimetoken(new List<long>{1549982652}).Async((result, status) =>{    
                     if(status.Error){
                         Debug.Log (string.Format("In Example, MessageCounts Error: {0} {1} {2}", status.StatusCode, status.ErrorData, status.Category));
@@ -515,11 +526,10 @@ namespace PubNubExample
         void FetchRecursive(long start, List<string> listChannels){
 
             pubnub.FetchMessages().Channels(listChannels).Start(start).Async ((result, status) => {
-            //pubnub.FetchMessages().Channels(new List<string>{"channel2"}).Async ((result, status) => {    
                 if(status.Error){
                     Debug.Log (string.Format("In Example, FetchMessages Error: {0} {1} {2}", status.StatusCode, status.ErrorData, status.Category));
                 } else {
-                    Debug.Log (string.Format("In FetchMessages, result: "));//,result.EndTimetoken, result.Messages[0].ToString()));
+                    Debug.Log (string.Format("In FetchMessages, result: "));
                     foreach(KeyValuePair<string, List<PNMessageResult>> kvp in result.Channels){
                         Debug.Log("kvp channelname" + kvp.Key);
                         foreach(PNMessageResult pnMessageResut in kvp.Value){
@@ -550,8 +560,6 @@ namespace PubNubExample
             });
         }
 
-
-
         void SubscribeCallbackHandler(object sender, EventArgs e){
             Debug.Log("SubscribeCallbackHandler Event handler");
             SubscribeEventEventArgs mea = e as SubscribeEventEventArgs;
@@ -560,15 +568,15 @@ namespace PubNubExample
                     switch (mea.Status.Category){
                         case PNStatusCategory.PNConnectedCategory:
                         PrintStatus(mea.Status);
-                        pubnub.Publish().Channel("my_channel").Message("Hello from the PubNub Unity SDK").Ttl(10).UsePost(true).Async((result, status) => {
-                            if(!status.Error){
-                                Debug.Log (string.Format("DateTime {0}, In Publish Example, Timetoken: {1}", DateTime.UtcNow , result.Timetoken));
-                            } else {
-                                Debug.Log (status.Error);
-                                Debug.Log (status.ErrorData.Info);
-                            }
+                        // pubnub.Publish().Channel("my_channel").Message("Hello from the PubNub Unity SDK").Ttl(10).UsePost(true).Async((result, status) => {
+                        //     if(!status.Error){
+                        //         Debug.Log (string.Format("DateTime {0}, In Publish Example, Timetoken: {1}", DateTime.UtcNow , result.Timetoken));
+                        //     } else {
+                        //         Debug.Log (status.Error);
+                        //         Debug.Log (status.ErrorData.Info);
+                        //     }
 
-                        });
+                        // });
                         
                         break;
                         case PNStatusCategory.PNUnexpectedDisconnectCategory:
@@ -582,8 +590,6 @@ namespace PubNubExample
                 }
                 if(mea.MessageResult != null){
                     Debug.Log ("In Example, SubscribeCallback in message" + mea.MessageResult.Channel + mea.MessageResult.Payload);
-                    //var a = mea.MessageResult.Payload as Dictionary<string, string>;
-                    //var b = a["a"];
                     Display(string.Format("SubscribeCallback Result: {0}", pubnub.JsonLibrary.SerializeToJsonString(mea.MessageResult.Payload)));
                 }
                 if(mea.PresenceEventResult != null){
@@ -605,6 +611,16 @@ namespace PubNubExample
                         Display(string.Format("RemovePushNotificationsFromChannels: {0}", result.Message));
                     }
                 });
+            pubnub.RemovePushNotificationsFromChannels().Channels(listChannels).DeviceID(deviceId).PushType(PNPushType.APNS2).Topic("a").Async((result, status) => {
+                    Debug.Log ("in RemovePushNotificationsFromChannels");
+                    if(status.Error){
+                        Debug.Log (string.Format("In Example, RemovePushNotificationsFromChannels Error: {0} {1} {2}", status.StatusCode, status.ErrorData, status.Category));
+                    } else {
+                        Debug.Log (string.Format("DateTime {0}, In RemovePushNotificationsFromChannels, result: {1}", DateTime.UtcNow, result.Message));
+                        Display(string.Format("RemovePushNotificationsFromChannels: {0}", result.Message));
+                    }
+                });    
+               
         }
 
         void AuditPushChannelProvisions(PubNub pubnub, string deviceId, PNPushType pnPushType){
@@ -618,6 +634,17 @@ namespace PubNubExample
                     }
 
                 });
+            pubnub.AuditPushChannelProvisions().DeviceID(deviceId).PushType(pnPushType).PushType(PNPushType.APNS2).Topic("a").Async((result, status) => {
+                    Debug.Log ("in AuditPushChannelProvisions");
+                    if(status.Error){
+                        Debug.Log (string.Format("In Example, AuditPushChannelProvisions Error: {0} {1} {2}", status.StatusCode, status.ErrorData, status.Category));
+                    } else {
+                        Debug.Log (string.Format("DateTime {0}, In AuditPushChannelProvisions, result: {1}", DateTime.UtcNow, (result.Channels!=null)?string.Join(",", result.Channels.ToArray()):""));
+                        Display(string.Format("AuditPushChannelProvisions: {0}", (result.Channels!=null)?string.Join(",", result.Channels.ToArray()):""));
+                    }
+
+                });                
+                
         }
 
         void RemoveAllPushNotificationsFromChannels(PubNub pubnub, string deviceId, PNPushType pnPushType){
@@ -631,6 +658,17 @@ namespace PubNubExample
                     }
 
                 });
+            pubnub.RemoveAllPushNotifications().DeviceID(deviceId).PushType(PNPushType.APNS2).Topic("a").Async((result, status) => {
+                    Debug.Log ("in RemoveAllPushNotificationsFromChannels");
+                    if(status.Error){
+                        Debug.Log (string.Format("In Example, RemoveAllPushNotificationsFromChannels Error: {0} {1} {2}", status.StatusCode, status.ErrorData, status.Category));
+                    } else {
+                        Debug.Log (string.Format("DateTime {0}, In RemoveAllPushNotificationsFromChannels, result: {1}", DateTime.UtcNow, result.Message));
+                        Display(string.Format("RemoveAllPushNotificationsFromChannels: {0}", result.Message));
+                    }
+
+                });                
+            
         }
 
         void RemoveChannelsFromCG(PubNub pubnub, string cg, List<string> listChannelsRemove){
@@ -660,7 +698,6 @@ namespace PubNubExample
 
         void FetchMessages(PubNub pubnub, List<string> listChannels){
             pubnub.FetchMessages().Channels(listChannels).IncludeMeta(true).Async ((result, status) => {
-            //pubnub.FetchMessages().Channels(new List<string>{"channel2"}).Async ((result, status) => {    
                 if(status.Error){
                     Debug.Log (string.Format("In Example, FetchMessages Error: {0} {1} {2}", status.StatusCode, status.ErrorData, status.Category));
                 } else {
@@ -685,25 +722,33 @@ namespace PubNubExample
                     if(kvp.Value != null){
                         PNHereNowChannelData hereNowChannelData = kvp.Value as PNHereNowChannelData;
                         if(hereNowChannelData != null){
-                            Debug.Log ("in HereNow channelName: " + hereNowChannelData.ChannelName);
+                            StringBuilder sb = new StringBuilder();
+                            sb.Append("in HereNow channelName: " + hereNowChannelData.ChannelName);
                             Display(string.Format("channelName: {0}", hereNowChannelData.ChannelName));
-                            Debug.Log ("in HereNow channel occupancy: " + hereNowChannelData.Occupancy.ToString());
+                            sb.Append("in HereNow channel occupancy: " + hereNowChannelData.Occupancy.ToString());
                             Display(string.Format("channelName: {0}", hereNowChannelData.Occupancy));
                             List<PNHereNowOccupantData> hereNowOccupantData = hereNowChannelData.Occupants as List<PNHereNowOccupantData>;
                             if(hereNowOccupantData != null){
                                 foreach(PNHereNowOccupantData pnHereNowOccupantData in hereNowOccupantData){
                                     if(pnHereNowOccupantData.State != null){
-                                        Debug.Log ("in HereNow channel State: " + pnHereNowOccupantData.State.ToString());
+                                        sb.Append ("in HereNow channel State: " + pnHereNowOccupantData.State.ToString());
+                                        Dictionary<string, object> state = pnHereNowOccupantData.State as Dictionary<string, object>;
+                                        foreach (KeyValuePair<string, object> kvpState in state){
+                                            sb.Append (kvp.Key);
+                                            sb.Append ("=====>");
+                                            sb.Append (kvp.Value.ToString());
+                                        }
                                         Display(string.Format("State: {0}", pnHereNowOccupantData.State.ToString()));
                                     }
                                     if(pnHereNowOccupantData.UUID != null){
-                                        Debug.Log ("in HereNow channel UUID: " + pnHereNowOccupantData.UUID.ToString());
+                                        sb.Append ("in HereNow channel UUID: " + pnHereNowOccupantData.UUID.ToString());
                                         Display(string.Format("UUID: {0}", pnHereNowOccupantData.UUID.ToString()));
                                     }
                                 }
                             } else {
-                                Debug.Log ("in HereNow hereNowOccupantData null"); 
+                                sb.Append ("in HereNow hereNowOccupantData null"); 
                             }
+                            Debug.Log(sb.ToString());
                         } else {
                             Debug.Log ("in HereNow hereNowChannelData null"); 
                         }
@@ -745,22 +790,14 @@ namespace PubNubExample
                     (s.ClientRequest != null) ? s.ClientRequest.ToString() : "null"
                     ));
 
-                    //Display (s.Category.ToString());
             }
         }
 
         void Display(string textToDisplay){
             TextContent.text  = string.Format("{0}\n{1}", TextContent.text, textToDisplay);
-            //UnityEngine.UI.Text txtRef = (UnityEngine.UI.Text)GameObject.Find("CountText").GetComponent<Text>;
-            //Debug.Log("TextContent.text 2:" + TextContent.text);
-            //TextScroll 
-            //Canvas.
-            //Debug.Log("transform:" + transform.Find("TextContent").name);
         }
 
-        //public string stringToEdit = "Hello World";
         void OnGUI() {
-            //stringToEdit = GUI.TextField(new Rect(10, 10, 600, 600), stringToEdit, 600);
             
         }
 

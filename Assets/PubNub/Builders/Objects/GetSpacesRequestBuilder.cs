@@ -9,8 +9,10 @@ namespace PubNubAPI
         private int GetSpacesLimit { get; set; }
         private string GetSpacesEnd { get; set; }
         private string GetSpacesStart { get; set; }
+        private string GetSpacesFilter { get; set; }        
         private bool GetSpacesCount { get; set; }
         private PNUserSpaceInclude[] GetSpacesInclude { get; set; }
+        private List<string> SortBy { get; set; }
         public GetSpacesRequestBuilder(PubNubUnity pn) : base(pn, PNOperationType.PNGetSpacesOperation)
         {
         }
@@ -44,6 +46,14 @@ namespace PubNubAPI
             GetSpacesEnd = end;
             return this;
         }
+        public GetSpacesRequestBuilder Filter(string filter){
+            GetSpacesFilter = filter;
+            return this;
+        }
+        public GetSpacesRequestBuilder Sort(List<string> sortBy){
+            SortBy = sortBy;
+            return this;
+        }        
         public GetSpacesRequestBuilder Count(bool count)
         {
             GetSpacesCount = count;
@@ -55,6 +65,7 @@ namespace PubNubAPI
             requestState.OperationType = OperationType;
 
             string[] includeString = (GetSpacesInclude==null) ? new string[]{} : GetSpacesInclude.Select(a=>a.GetDescription().ToString()).ToArray();
+            List<string> sortFields = SortBy ?? new List<string>();
 
             Uri request = BuildRequests.BuildObjectsGetSpacesRequest(
                     GetSpacesLimit,
@@ -63,8 +74,11 @@ namespace PubNubAPI
                     GetSpacesCount,
                     string.Join(",", includeString),
                     this.PubNubInstance,
-                    this.QueryParams
+                    this.QueryParams,
+                    GetSpacesFilter,
+                    string.Join(",", sortFields)
                 );
+            request = this.PubNubInstance.TokenMgr.AppendTokenToURL( request.OriginalString, "", PNResourceType.PNSpaces, OperationType);
             base.RunWebRequest(qm, request, requestState, this.PubNubInstance.PNConfig.NonSubscribeTimeout, 0, this);
         }
 
