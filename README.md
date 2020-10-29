@@ -1,27 +1,45 @@
-# Unity Realtime Chat Room Tutorial
+# PubNub Unity Sample App
 
-In this tutorial, we'll walk through how to build a basic multiplayer lobby chat room with the Unity 3D game engine. This tutorial will work across iOS, Android, Web and Consoles, so no matter what device you are exporting too, users will be able to chat between devices. PubNub can also power the realtime interactions between players in your game, not just chat. This makes the possibilities endless with the PubNub API.
+This repository contains the files required to run the [PubNub Unity Quickstart](https://www.pubnub.com/docs/platform/quickstarts/unity).
 
-[![Build a Realtime Chatroom Lobby in Unity for iOS, Android and Web](https://i.ytimg.com/vi/AdLiDrBhPrY/hqdefault.jpg)](https://youtu.be/AdLiDrBhPrY)
+PubNub takes care of the infrastructure and APIs needed for the realtime communication layer of your application. Work on your app's logic and let PubNub handle sending and receiving data across the world in less than 100ms.
 
-## Step 1: Environment Setup
-Let's up set up the environment first. The step is to import the PubNub SDK into your Unity project. You can do so by downloading the latest PubNub.unitypackage, then importing that package in Unity by going to **Assets -> Import Package -> Custom Package**.
+## Get keys
 
-Once imported, you may notice you have some errors in your console window. If you are getting error CS0234: The type or namespace name 'TestTools' does not exist, fix this problem by going to: **Window -> General -> Test Runner**. Then click on the drop-down menu in the top right corner and enable playmode tests for all assemblies.
+You will need publish and subscribe keys to authenticate your app. Get your keys from the [Admin Portal](https://dashboard.pubnub.com/login).
 
-![Enable Play Mode](https://unity.chat/media/enableplaymode-small.png)
+## Set up the project
 
-*Note: If you download the GitHub repo, you won't have to re-import the PubNub package. You will only have to enable the Test Runner. Download that the repo <a href="https://github.com/JordanSchuetz/Unity-Realtime-Chat-Room-Tutorial">here</a>.*
+Clone the repository and use the files in there.
+ 
+1. Download and install [Unity](https://store.unity.com/). 
+2. In Unity, create a new 2d project called `pnquickstart`.
+3. Clone this repository.
+4. In Unity Editor, open the `pnquickstart` project, navigate to Assets -> Import Package -> Custom Package and import the `unity-pubnub-realtime-chat.unitypackage` file you can find in your cloned repository.
+5. Navigate to Window -> General -> Test Runner, click the 3 vertical dots icon next to the window close button and click Enable playmode tests for all assemblies.
+6. Restart Unity editor.
 
-![Screenshot](https://unity.chat/media/screenshot1.png)
+## Add project files
 
-The GitHub repo should include four folders. Assets, PubNub, Scenes and Scripts. In the Assets folder, there is a background image, submit button, font files and a loading circle. In the Scripts folder, there are the two scripts called SendMessage and LoadingCircle. The SendMessage script is where we will be writing the code to send and receive messages from clients in realtime.
+All the files are included in the `unity-pubnub-realtime-chat.unitypackage` file you imported. You don't need to add any other files.
 
-## Finish the Tutorial by going to https://www.pubnub.com/docs/chat/tutorials/unity
+## Run the app
 
-Try the demo here. Open up two browser windows and zoom out in your browser window
-https://pubnub.github.io/Unity-Realtime-Chat-Room-Tutorial/
+1. Navigate to Assets -> Scenes, double-click the `RealtimeChat.unity` scene, and click the Run button.
 
-## About PubNub
+    The chat messages will appear in the middle of the screen and are removed from the UI once they no longer fit on the screen.
 
-PubNub allows developers to build low-latency realtime applications that perform reliably and securely, at global scale. All you have to do is write the front end code with PubNub's easy to use API's, and PubNub handles all the back-end for you. This is important in the game development industry since if your game becomes more popular than you planned, you can risk your multiplayer servers having downtime.
+    ![](unity-quickstart-ui.png)
+
+    The UI is simple but uses a list view that cleanly displays each event.
+
+2. Submit a new entry.
+
+## Documentation
+
+* [Build your first realtime Unity app with PubNub](https://www.pubnub.com/docs/platform/quickstarts/unity)
+* [API reference for Unity](https://www.pubnub.com/docs/unity3d-c-sharp/pubnub-c-sharp-sdk)
+
+## Support
+
+If you **need help** or have a **general question**, contact support@pubnub.com.
