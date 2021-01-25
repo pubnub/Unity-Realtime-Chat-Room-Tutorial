@@ -16,19 +16,19 @@ public class SendMessage : MonoBehaviour {
     public Button SubmitButton;
     public Canvas canvasObject;
     public InputField UsernameInput;
-    public InputField TextInput;
+    public InputField MessageInput;
     public int indexcounter = 0;
     public Text deleteText;
     public Text moveTextUpwards;
     private Text text;
 
-    float paddingX = -10F;
+    float paddingX = -75F;
     float paddingY = 300F;
-    float padding = 550F;
-    float height = 30;
+    float padding = 475F;
+    float height = 22;
     ushort maxMessagesToDisplay = 12;
 
-    string channel = "chatchannel3";
+    string channel = "chatchannel";
 
     // Create a chat message queue so we can interate through all the messages
     Queue<GameObject> chatMessageQueue = new Queue<GameObject>();
@@ -120,8 +120,8 @@ public class SendMessage : MonoBehaviour {
         // Assign text to the gameobject. Add visual properties to text
         var chatText = chatMessage.GetComponent<Text>();
         chatText.font = customFont;
-        chatText.color = UnityEngine.Color.blue;
-        chatText.fontSize = 25;
+        chatText.color = UnityEngine.Color.black;
+        chatText.fontSize = 18;
         
         // Assign a RectTransform to gameobject to maniuplate positioning of chat.
         RectTransform rectTransform;
@@ -165,7 +165,7 @@ public class SendMessage : MonoBehaviour {
         // create a JSON object from input field input
         JSONInformation publishMessage = new JSONInformation();
         publishMessage.username = string.Concat(UsernameInput.text, ": ");
-        publishMessage.text = TextInput.text;
+        publishMessage.text = MessageInput.text;
         string publishMessageToJSON = JsonUtility.ToJson(publishMessage);
 
         // Publish the JSON object to the assigned PubNub Channel
@@ -185,6 +185,6 @@ public class SendMessage : MonoBehaviour {
                 }
             });
 
-        TextInput.text = "";
+        MessageInput.text = "";
     }
 }
