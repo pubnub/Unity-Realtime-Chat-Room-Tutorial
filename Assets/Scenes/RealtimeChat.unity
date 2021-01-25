@@ -460,7 +460,7 @@ MonoBehaviour:
   SubmitButton: {fileID: 1773670990}
   canvasObject: {fileID: 1971158947}
   UsernameInput: {fileID: 274595895}
-  MessageInput: {fileID: 1992686710}
+  TextInput: {fileID: 1992686710}
   indexcounter: 0
   deleteText: {fileID: 1917037385}
   moveTextUpwards: {fileID: 0}

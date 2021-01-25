@@ -16,7 +16,7 @@ public class SendMessage : MonoBehaviour {
     public Button SubmitButton;
     public Canvas canvasObject;
     public InputField UsernameInput;
-    public InputField MessageInput;
+    public InputField TextInput;
     public int indexcounter = 0;
     public Text deleteText;
     public Text moveTextUpwards;
@@ -165,7 +165,7 @@ public class SendMessage : MonoBehaviour {
         // create a JSON object from input field input
         JSONInformation publishMessage = new JSONInformation();
         publishMessage.username = string.Concat(UsernameInput.text, ": ");
-        publishMessage.text = MessageInput.text;
+        publishMessage.text = TextInput.text;
         string publishMessageToJSON = JsonUtility.ToJson(publishMessage);
 
         // Publish the JSON object to the assigned PubNub Channel
@@ -185,6 +185,6 @@ public class SendMessage : MonoBehaviour {
                 }
             });
 
-        MessageInput.text = "";
+        TextInput.text = "";
     }
 }
