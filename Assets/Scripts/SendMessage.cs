@@ -22,13 +22,13 @@ public class SendMessage : MonoBehaviour {
     public Text moveTextUpwards;
     private Text text;
 
-    float paddingX = -10F;
+    float paddingX = -75F;
     float paddingY = 300F;
-    float padding = 550F;
-    float height = 30;
+    float padding = 475F;
+    float height = 22;
     ushort maxMessagesToDisplay = 12;
 
-    string channel = "chatchannel3";
+    string channel = "chatchannel";
 
     // Create a chat message queue so we can interate through all the messages
     Queue<GameObject> chatMessageQueue = new Queue<GameObject>();
@@ -120,8 +120,8 @@ public class SendMessage : MonoBehaviour {
         // Assign text to the gameobject. Add visual properties to text
         var chatText = chatMessage.GetComponent<Text>();
         chatText.font = customFont;
-        chatText.color = UnityEngine.Color.blue;
-        chatText.fontSize = 25;
+        chatText.color = UnityEngine.Color.black;
+        chatText.fontSize = 18;
         
         // Assign a RectTransform to gameobject to maniuplate positioning of chat.
         RectTransform rectTransform;
