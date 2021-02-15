@@ -40,7 +40,7 @@ public class SendMessage : MonoBehaviour {
         pnConfiguration.PublishKey = "demo";
         pnConfiguration.SubscribeKey = "demo";
         pnConfiguration.LogVerbosity = PNLogVerbosity.BODY;
-        pnConfiguration.UUID = System.Guid.NewGuid().ToString();
+        pnConfiguration.UUID = "user-1";
         pubnub = new PubNub(pnConfiguration);
 
         // Add Listener to Submit button to send messages
