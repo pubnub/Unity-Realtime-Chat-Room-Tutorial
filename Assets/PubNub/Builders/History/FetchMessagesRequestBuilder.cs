@@ -15,7 +15,7 @@ namespace PubNubAPI
         private long StartTime = -1;
         private long EndTime = -1;
         
-        private const ushort MaxCount = 25;
+        private const ushort MaxCount = 100;
         private ushort count = MaxCount;
         private ushort HistoryCount { 
             get {
@@ -33,6 +33,9 @@ namespace PubNubAPI
         private bool IncludeMetaInHistory;
         private bool IncludeMessageActionsInHistory;
         
+        private bool IncludeUUIDInHistory;
+        private bool IncludeMessageTypeInHistory;
+        
         private bool ReverseHistory;
         private bool IncludeTimetokenInHistory;
         public FetchMessagesRequestBuilder IncludeTimetoken(bool include){
@@ -42,6 +45,16 @@ namespace PubNubAPI
 
         public FetchMessagesRequestBuilder IncludeMessageActions(bool includeMessageActions){
             IncludeMessageActionsInHistory = includeMessageActions;
+            return this;
+        }
+
+        public FetchMessagesRequestBuilder IncludeUUID(bool includeUUID){
+            IncludeUUIDInHistory = includeUUID;
+            return this;
+        }
+
+        public FetchMessagesRequestBuilder IncludeMessageType(bool includeMessageType){
+            IncludeMessageTypeInHistory = includeMessageType;
             return this;
         }
 
@@ -105,6 +118,10 @@ namespace PubNubAPI
             this.PubNubInstance.PNLog.WriteToLog(string.Format ("FetchMessagesRequestBuilder: \nChannel {0} \nStartTime: {1} \nthis.EndTime:{2} \nthis.HistoryCount:{3} \nthis.ReverseHistory:{4}", string.Join(",", this.ChannelsToUse.ToArray()), this.StartTime, this.EndTime, this.HistoryCount, this.ReverseHistory), PNLoggingMethod.LevelInfo);
             #endif
 
+            if(IncludeMessageActionsInHistory || ChannelsToUse.Count > 1){
+                this.HistoryCount = 25;
+            }
+
             Uri request =  BuildRequests.BuildFetchRequest(
                     ChannelsToUse.ToArray(),
                     this.StartTime,
@@ -115,7 +132,9 @@ namespace PubNubAPI
                     this.PubNubInstance,
                     this.QueryParams,
                     this.IncludeMetaInHistory,
-                    this.IncludeMessageActionsInHistory
+                    this.IncludeMessageActionsInHistory,
+                    this.IncludeMessageTypeInHistory,
+                    this.IncludeUUIDInHistory
                 );
             
             base.RunWebRequest(qm, request, requestState, this.PubNubInstance.PNConfig.NonSubscribeTimeout, 0, this); 
@@ -146,6 +165,14 @@ namespace PubNubAPI
                                 pnFetchMessagesResult.Channels = channelsResult;
                             }
                         }
+                        object moreObject;
+                        dictionary.TryGetValue("more", out moreObject);
+                        if(moreObject != null){
+                            Dictionary<string, object> more;
+                            if(CreateMoreObjectResult(moreObject, out more)){
+                                pnFetchMessagesResult.More = more;
+                            }
+                        }
                     }
                 } else {
                     pnFetchMessagesResult = null;
@@ -158,7 +185,31 @@ namespace PubNubAPI
 
             Callback(pnFetchMessagesResult, pnStatus);
         }
-        
+
+        protected bool CreateMoreObjectResult(object moreFieldDictionary, out Dictionary<string, dynamic> moreResult){
+            moreResult = new Dictionary<string, object>();
+            Dictionary<string, object> moreFields = moreFieldDictionary as Dictionary<string, object>;
+            object url;
+            if(moreFields.TryGetValue("url", out url)){
+                moreResult.Add("url", url as string);
+            }
+            object start;
+            long startTimetoken;
+            if (moreFields.TryGetValue("start", out start)){
+                if(long.TryParse (start as string, out startTimetoken)){
+                    moreResult.Add("start", startTimetoken);
+                }
+            }
+            object maxObj;
+            int max;
+            if(moreFields.TryGetValue("max", out maxObj)){
+                if (int.TryParse(maxObj.ToString(), out max)) {
+                    moreResult.Add("max", max);
+                }
+            }
+
+            return true;
+        }
         protected bool CreateFetchMessagesResult(object objChannelsDict, out Dictionary<string, List<PNMessageResult>> channelsResult ){
             Dictionary<string, object> channelsDict = objChannelsDict as Dictionary<string, object>;
             channelsResult = new Dictionary<string, List<PNMessageResult>>();
@@ -176,9 +227,24 @@ namespace PubNubAPI
                         #endif
                         continue;
                     }
+                    #if (ENABLE_PUBNUB_LOGGING)
+                    this.PubNubInstance.PNLog.WriteToLog(string.Format ("kvpair.Value {0}", kvpair.Value), PNLoggingMethod.LevelInfo);
+                    #endif
                     object[] channelDetails = kvpair.Value as object[];
+                    if(channelDetails == null){
+                        List<object> channelDetailsList = kvpair.Value as List<object>;
+                        if(channelDetailsList != null){
+                            channelDetails = channelDetailsList.Cast<object>().ToArray();
+                        }
+                    }
+                    #if (ENABLE_PUBNUB_LOGGING)
+                    this.PubNubInstance.PNLog.WriteToLog(string.Format ("CreateFetchMessagesResult: channelDetails {0}", channelDetails.Length), PNLoggingMethod.LevelInfo);
+                    #endif
+
                     List<PNMessageResult> lstMessageResult = new List<PNMessageResult>();
+                    int count = 0;
                     foreach(object messageData in channelDetails){
+                        count++;
                         Dictionary<string, object> messageDataDict = messageData as Dictionary<string, object>;
                         if(messageDataDict!=null){
                             
@@ -194,19 +260,21 @@ namespace PubNubAPI
                             }
                             
                             object objTimetoken;
-                            messageDataDict.TryGetValue("timetoken", out objTimetoken);
-                            long timetoken;
-                            if(long.TryParse(objTimetoken.ToString(), out timetoken)){
-                                #if (ENABLE_PUBNUB_LOGGING)
-                                this.PubNubInstance.PNLog.WriteToLog(string.Format ("CreateFetchMessagesResult: timetoken {0}.", timetoken.ToString()), PNLoggingMethod.LevelInfo);
-                                #endif
+                            
+                            long timetoken = 0;
+                            if(messageDataDict.TryGetValue("timetoken", out objTimetoken)){
+                                if(long.TryParse(objTimetoken.ToString(), out timetoken)){
+                                    #if (ENABLE_PUBNUB_LOGGING)
+                                    this.PubNubInstance.PNLog.WriteToLog(string.Format ("CreateFetchMessagesResult: timetoken {0}.", timetoken.ToString()), PNLoggingMethod.LevelInfo);
+                                    #endif
+                                }
                             }
 
                             if(!string.IsNullOrEmpty(this.PubNubInstance.PNConfig.CipherKey) && (this.PubNubInstance.PNConfig.CipherKey.Length > 0)){
                                 //TODO: handle exception
                                 objPayload = Helpers.DecodeMessage(this.PubNubInstance.PNConfig.CipherKey, objPayload, OperationType, this.PubNubInstance);
                             } 
-                            
+
                             PNMessageResult pnMessageResult = new PNMessageResult(
                                 channelName, 
                                 channelName,
@@ -216,13 +284,27 @@ namespace PubNubAPI
                                 meta,
                                 ""
                             );
+                            
+                            object objMessageType;
+                            if(messageDataDict.TryGetValue("message_type", out objMessageType)){
+                                int messageType;
+                                if(int.TryParse(objMessageType.ToString(), out messageType)){
+                                    #if (ENABLE_PUBNUB_LOGGING)
+                                    this.PubNubInstance.PNLog.WriteToLog(string.Format ("CreateFetchMessagesResult: messageType {0}.", messageType.ToString()), PNLoggingMethod.LevelInfo);
+                                    #endif
+                                } 
+                                pnMessageResult.MessageType = messageType;    
+                            } 
 
+                            object objUUID;
+                            if(messageDataDict.TryGetValue("uuid", out objUUID)){
+                                pnMessageResult.IssuingClientId = objUUID.ToString();
+                            } 
+                            
                             pnMessageResult.MessageActions = MessageActionsHelpers.ExtractMessageActions(messageDataDict); 
+                            
                             lstMessageResult.Add(pnMessageResult);
-                            #if (ENABLE_PUBNUB_LOGGING)
-                            this.PubNubInstance.PNLog.WriteToLog(string.Format ("CreateFetchMessagesResult: pnMessageResult {0}.", pnMessageResult.ToString()), PNLoggingMethod.LevelInfo);
-                            #endif
-
+                            
                         }
                     }
                     channelsResult.Add(channelName, lstMessageResult);
