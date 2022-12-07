@@ -1,3 +1,7 @@
+## Please note that this project is no longer actively maintained or accepting Pull Requests.  Please use the [Unity Karting Game](https://github.com/PubNubDevelopers/unity-karting-game) instead.
+
+-------------------------------
+
 # PubNub Unity Sample App
 
 This repository contains the files required to run the [PubNub Unity Quickstart](https://www.pubnub.com/docs/platform/quickstarts/unity).
